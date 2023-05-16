@@ -11,21 +11,26 @@
 
 class Board {
 public:
-    Board(size_t M, size_t N) : num_rows_(M), num_cols_(N), storage_(num_rows_ * num_cols_) {
-      storage_[Random::get(0,M) * Random::get(0, N) + N] = 2;
+    Board(int M, int N, bool RandStart = false) : num_rows_(M), num_cols_(N), storage_(num_rows_ * num_cols_) {
+       if(RandStart){random_position();}
     }
 
-    double&       operator()(size_t i, size_t j) { return storage_[i * num_cols_ + j]; }
-    const double& operator()(size_t i, size_t j) const { return storage_[i * num_cols_ + j]; }
+    double&       operator()(int i, int j) { return storage_[i * num_cols_ + j]; }
+    const double& operator()(int i, int j) const { return storage_[i * num_cols_ + j]; }
 
+    Board move(Board &board, char dir);
 
-    size_t num_rows() const { return num_rows_; }
-    size_t num_cols() const { return num_cols_; }
+    [[nodiscard]] int num_rows() const { return num_rows_; }
+    [[nodiscard]] int num_cols() const { return num_cols_; }
 
     friend std::ostream& operator<< (std::ostream& out, const Board& board);
 
+    void random_position(){
+      storage_[Random::get(0,num_rows_ - 1) * Random::get(0, num_cols_ - 1) + num_cols_] = 2;
+    }
+
 private:
-    size_t              num_rows_, num_cols_;
+    int              num_rows_, num_cols_;
     std::vector<double> storage_;
 };
 
@@ -38,6 +43,71 @@ std::ostream& operator<< (std::ostream &out, const Board &board)
     }  std::cout << std::endl;
   }
   return out;
+}
+
+Board Board::move(Board &board, char dir) {
+  Board new_board = Board(board.num_rows_, board.num_cols_);
+
+  for (int i = 0; i < board.num_rows(); ++i) {
+    for (int j = 0; j < board.num_cols(); ++j) {
+      switch (dir) {
+        case 'd':
+          if ((i + 1) < board.num_rows()){
+            if ((board(i, j) == board(i + 1, j)) && board(i,j) != 0) {
+              new_board(i + 1, j) = 2 * board(i, j);
+            } else if (board(i,j) != 0 && board(i + 1, j) == 0){
+              new_board(i + 1, j) = board(i, j);
+            }
+          } else if ((i + 1) == board.num_rows()){
+            if (new_board(i,j) == 0) {
+              new_board(i, j) = board(i, j);
+            }
+          }
+          break;
+        case 'u':
+          if ((i - 1) >= 0){
+            if ((board(i, j) == board(i - 1, j)) && board(i,j) != 0) {
+              new_board(i - 1, j) = 2 * board(i, j);
+            } else if (board(i,j) != 0 && board(i - 1, j) == 0){
+              new_board(i - 1, j) = board(i, j);
+            }
+          } else if ((i - 1) < 0){
+            if (new_board(i,j) == 0) {
+              new_board(i, j) = board(i, j);
+            }
+          }
+          break;
+        case 'l':
+          if ((j - 1) >= 0){
+            if ((board(i, j) == board(i, j - 1)) && board(i,j) != 0) {
+              new_board(i, j - 1) = 2 * board(i, j);
+            } else if (board(i,j) != 0 && board(i, j - 1) == 0){
+              new_board(i, j - 1) = board(i, j);
+            }
+          } else if ((j - 1) < 0){
+            if (new_board(i,j) == 0) {
+              new_board(i, j) = board(i, j);
+            }
+          }
+          break;
+        case 'r':
+          if ((j + 1) < board.num_cols()){
+            if ((board(i, j) == board(i, j + 1)) && board(i,j) != 0) {
+              new_board(i, j + 1) = 2 * board(i, j);
+            } else if (board(i,j) != 0 && board(i, j + 1) == 0){
+              new_board(i, j + 1) = board(i, j);
+            }
+          } else if ((j + 1) == board.num_cols()){
+            if (new_board(i,j) == 0) {
+              new_board(i, j) = board(i, j);
+            }
+          }
+          break;
+      }
+    }
+  }
+
+  return new_board;
 }
 
 #endif //UNTITLED3_BOARD_H
