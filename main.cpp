@@ -1,8 +1,9 @@
 #include <iostream>
+
 #include "Board.h"
 
 int main() {
-  Board Game_Board(4,4, true);
+  Board Game_Board(4,4);
   std::cout << Game_Board;
 
   bool keep_playing = true;
