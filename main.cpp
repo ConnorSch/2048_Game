@@ -14,7 +14,7 @@ int main() {
     if(dir == 'n'){
       keep_playing = false;
     } else {
-      Game_Board = Game_Board.move(Game_Board, dir);
+      Game_Board.move(Game_Board, dir);
       std::cout << Game_Board;
     }
   }
