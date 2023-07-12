@@ -15,13 +15,24 @@ std::ostream& operator<< (std::ostream &out, const Board &board)
   return out;
 }
 
-void Board::move(Board &board, char dir){
+std::string values_to_string(std::vector<int> values){
+  std::string val_str;
+  for(int i = 0; i < size(values); ++i){
+    val_str += std::to_string(values[i]);
+    if (i < (size(values)-1)){
+      val_str += ",";
+    }
+  }
+  return val_str;
+}
+
+bool Board::move(Board &board, char dir){
   int num_cols = board.num_cols();
   int num_rows = board.num_rows();
   board.num_moves_++;
   std::vector<int> row;
   std::pair<std::vector<int>,bool> move_response;
-  bool move_able[4] = {false};
+  bool invalid_moves[4] = {false};
 
   switch (dir){
     case 'd':
@@ -31,7 +42,7 @@ void Board::move(Board &board, char dir){
         }
         move_response = movement(row, true);
         std::vector<int> response_row = move_response.first;
-        move_able[j] = move_response.second;
+        invalid_moves[j] = move_response.second;
         for (int k = 0; k < response_row.size(); ++k) {
           board(k,j) = response_row[k];
         }
@@ -46,7 +57,7 @@ void Board::move(Board &board, char dir){
         }
         move_response = movement(row, true);
         std::vector<int> response_row = move_response.first;
-        move_able[i] = move_response.second;
+        invalid_moves[i] = move_response.second;
 
         for (int k = 0; k < response_row.size(); ++k) {
           board(i,k) = response_row[k];
@@ -62,7 +73,7 @@ void Board::move(Board &board, char dir){
         }
         move_response = movement(row, false);
         std::vector<int> response_row = move_response.first;
-        move_able[i] = move_response.second;
+        invalid_moves[i] = move_response.second;
         for (int k = 0; k < response_row.size(); ++k) {
           board(i,k) = response_row[k];
         }
@@ -77,7 +88,7 @@ void Board::move(Board &board, char dir){
         }
         move_response = movement(row, false);
         std::vector<int> response_row = move_response.first;
-        move_able[j] = move_response.second;
+        invalid_moves[j] = move_response.second;
         for (int k = 0; k < response_row.size(); ++k) {
           board(k, j) = response_row[k];
         }
@@ -85,9 +96,25 @@ void Board::move(Board &board, char dir){
         row.clear();
       }
       break;
+    default:
+      std::cout << "Invalid move, please enter a valid move direction" <<std::endl;
   }
-  //if all of move_able is true then can't make that move
-  board.next_added_digit();
+  //if all of invalid_moves is true then can't make that move
+
+  bool end_game = false;
+  int sum = std::accumulate(invalid_moves, invalid_moves + 4, 0);
+  if (sum == 4){
+    std::cout<< "try a different direction, combinations found" << std::endl;
+  } else {
+    end_game = board.next_added_digit();
+  }
+  if (end_game){
+    return false;
+  } else {
+    return true;
+  }
+
+
 }
 
 std::pair<std::vector<int>,bool> Board::movement(std::vector<int> row, bool reverse_row){
@@ -127,3 +154,25 @@ std::pair<std::vector<int>,bool> Board::movement(std::vector<int> row, bool reve
   }
   return std::make_pair(rev_return_vec,invalid_move);
 }
+
+template<typename Function>
+void Board::store_state(Board &board, sqlite3* DB, const char* db_name, Function callback){
+  char* messageError;
+  int exit = sqlite3_open(db_name, &DB);
+  std::vector<int> other_adds = {1, board.num_rows(), 0};
+  std::string vector_str = values_to_string(board.storage());
+  std::string insert_str = "(1," + std::to_string(board.num_rows()) + ",NULL";
+  insert_str += vector_str + ")";
+
+  std::string query = "INSERT INTO GAME_BOARD VALUES " + insert_str;
+  exit = sqlite3_exec(DB, query.c_str(), callback, 0, &messageError);
+  if (exit != SQLITE_OK) {
+    std::cerr << "Error Insert" << std::endl;
+    sqlite3_free(messageError);
+  }
+  else
+    std::cout << "Records created Successfully!" << std::endl;
+  sqlite3_close(DB);
+}
+
+
