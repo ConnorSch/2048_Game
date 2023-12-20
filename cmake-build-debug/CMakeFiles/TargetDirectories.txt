@@ -1,3 +1,4 @@
+/Users/connor/CLionProjects/2048_Program/cmake-build-debug/CMakeFiles/SQLite.dir
 /Users/connor/CLionProjects/2048_Program/cmake-build-debug/CMakeFiles/2048_Program.dir
 /Users/connor/CLionProjects/2048_Program/cmake-build-debug/CMakeFiles/edit_cache.dir
 /Users/connor/CLionProjects/2048_Program/cmake-build-debug/CMakeFiles/rebuild_cache.dir
