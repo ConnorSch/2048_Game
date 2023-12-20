@@ -9,7 +9,6 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-#include <sqlite3.h>
 #include "RANDOM_MT_H.h"
 
 class Board {
@@ -24,9 +23,6 @@ public:
     const int& operator()(int i, int j) const { return storage_[i * num_cols_ + j]; }
 
     bool move(Board &board, char dir);
-
-    template<typename Function>
-    void store_state(Board &board,sqlite3* DB, const char* db_name, Function callback);
 
     static std::pair<std::vector<int>,bool> movement(std::vector<int> row,bool reverse_row);
 
@@ -56,7 +52,7 @@ public:
         std::cout << "Thanks for playing, your number of moves is: " << num_moves_ << std::endl;
         return true;
       } else {
-        int next_num_position = Random::get(0, zeros_index.size());
+        int next_num_position = Random::get(0, zeros_index.size()-1);
         storage_[zeros_index[next_num_position]] = 2;
         return false;
       }

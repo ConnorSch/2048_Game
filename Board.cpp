@@ -15,16 +15,6 @@ std::ostream& operator<< (std::ostream &out, const Board &board)
   return out;
 }
 
-std::string values_to_string(std::vector<int> values){
-  std::string val_str;
-  for(int i = 0; i < size(values); ++i){
-    val_str += std::to_string(values[i]);
-    if (i < (size(values)-1)){
-      val_str += ",";
-    }
-  }
-  return val_str;
-}
 
 bool Board::move(Board &board, char dir){
   int num_cols = board.num_cols();
@@ -154,25 +144,3 @@ std::pair<std::vector<int>,bool> Board::movement(std::vector<int> row, bool reve
   }
   return std::make_pair(rev_return_vec,invalid_move);
 }
-
-template<typename Function>
-void Board::store_state(Board &board, sqlite3* DB, const char* db_name, Function callback){
-  char* messageError;
-  int exit = sqlite3_open(db_name, &DB);
-  std::vector<int> other_adds = {1, board.num_rows(), 0};
-  std::string vector_str = values_to_string(board.storage());
-  std::string insert_str = "(1," + std::to_string(board.num_rows()) + ",NULL";
-  insert_str += vector_str + ")";
-
-  std::string query = "INSERT INTO GAME_BOARD VALUES " + insert_str;
-  exit = sqlite3_exec(DB, query.c_str(), callback, 0, &messageError);
-  if (exit != SQLITE_OK) {
-    std::cerr << "Error Insert" << std::endl;
-    sqlite3_free(messageError);
-  }
-  else
-    std::cout << "Records created Successfully!" << std::endl;
-  sqlite3_close(DB);
-}
-
-
