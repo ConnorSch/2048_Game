@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Board.h"
+#include "Algorithms.h"
 #include "DataConn.h"
 #include <sqlite3.h>
 #include <string>
@@ -91,6 +92,19 @@ void store_state(Board &board, sqlite3* DB, const char* db_name, Function callba
   sqlite3_close(DB);
 }
 
+
+void automatic_play(int game_id, std::pair<const char*, sqlite3*> db_info){
+  bool keep_playing = true;
+  Board Game_Board(4,4);
+  Algorithms Alg;
+  while(keep_playing){
+    char dir = Alg.next_dir();
+    keep_playing = Game_Board.move(Game_Board, dir);
+    store_state(Game_Board, db_info.second, db_info.first, callback, game_id, dir);
+  }
+}
+
+
 int main() {
  //create the sqlite database
   const char *db_name = "boardStates.db";
@@ -131,22 +145,29 @@ int main() {
   sqlite3_finalize(stmt);
   gameID++;
 
-  Board Game_Board(4,4);
-  std::cout << Game_Board;
+  bool auto_play = true;
+  if(!auto_play){
+    Board Game_Board(4,4);
+    std::cout << Game_Board;
 
-  bool keep_playing = true;
-  while (keep_playing) {
-    std::cout << "Enter a movement direction (l/r/u/d)(n to stop playing): " << std::endl;
-    char dir;
-    std::cin >> dir;
-    if(dir == 'n'){
-      keep_playing = false;
-    } else {
-      keep_playing = Game_Board.move(Game_Board, dir);
-      store_state(Game_Board, DB, db_name, callback, gameID, dir);
-      std::cout << Game_Board;
+    bool keep_playing = true;
+    while (keep_playing) {
+      std::cout << "Enter a movement direction (l/r/u/d)(n to stop playing): " << std::endl;
+      char dir;
+      std::cin >> dir;
+      if(dir == 'n'){
+        keep_playing = false;
+      } else {
+        keep_playing = Game_Board.move(Game_Board, dir);
+        store_state(Game_Board, DB, db_name, callback, gameID, dir);
+        std::cout << Game_Board;
+      }
     }
+  } else {
+    automatic_play(gameID, std::make_pair(db_name,DB));
   }
+
+
 
   sqlite3_close(DB);
 

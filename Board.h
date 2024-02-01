@@ -23,7 +23,7 @@ public:
     const int& operator()(int i, int j) const { return storage_[i * num_cols_ + j]; }
 
     bool move(Board &board, char dir);
-
+    // add a score variable that tracks the high score (adds the doubled blocks: i.e. 2 + 2 adds a score of 4 and 4 + 4 adds a score of 8)
     static std::pair<std::vector<int>,bool> movement(std::vector<int> row,bool reverse_row);
 
     [[nodiscard]] int num_rows() const { return num_rows_; }
