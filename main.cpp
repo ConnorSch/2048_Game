@@ -94,13 +94,15 @@ void store_state(Board &board, sqlite3* DB, const char* db_name, Function callba
 
 
 void automatic_play(int game_id, std::pair<const char*, sqlite3*> db_info){
-  bool keep_playing = true;
+  int keep_playing = 1;
   Board Game_Board(4,4);
-  Algorithms Alg;
-  while(keep_playing){
-    char dir = Alg.next_dir();
+  Algorithms Alg("random");
+  while(keep_playing != 0){
+    char dir = Alg.next_dir(Alg);
     keep_playing = Game_Board.move(Game_Board, dir);
-    store_state(Game_Board, db_info.second, db_info.first, callback, game_id, dir);
+    if(keep_playing != -1){
+      store_state(Game_Board, db_info.second, db_info.first, callback, game_id, dir);
+    }
   }
 }
 
@@ -150,13 +152,13 @@ int main() {
     Board Game_Board(4,4);
     std::cout << Game_Board;
 
-    bool keep_playing = true;
-    while (keep_playing) {
+    int keep_playing = 1;
+    while (keep_playing != 0) {
       std::cout << "Enter a movement direction (l/r/u/d)(n to stop playing): " << std::endl;
       char dir;
       std::cin >> dir;
       if(dir == 'n'){
-        keep_playing = false;
+        keep_playing = 0;
       } else {
         keep_playing = Game_Board.move(Game_Board, dir);
         store_state(Game_Board, DB, db_name, callback, gameID, dir);

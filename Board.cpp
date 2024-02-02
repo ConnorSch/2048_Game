@@ -16,7 +16,7 @@ std::ostream& operator<< (std::ostream &out, const Board &board)
 }
 
 
-bool Board::move(Board &board, char dir){
+int Board::move(Board &board, char dir){
   int num_cols = board.num_cols();
   int num_rows = board.num_rows();
   board.num_moves_++;
@@ -94,14 +94,16 @@ bool Board::move(Board &board, char dir){
   bool end_game = false;
   int sum = std::accumulate(invalid_moves, invalid_moves + 4, 0);
   if (sum == 4){
-    std::cout<< "try a different direction, combinations found" << std::endl;
+    std::cout<< "try a different direction, no combinations found" << std::endl;
+    board.num_moves_--;
+    return -1;
   } else {
     end_game = board.next_added_digit();
   }
   if (end_game){
-    return false;
+    return 0;
   } else {
-    return true;
+    return 1;
   }
 
 
