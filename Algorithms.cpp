@@ -5,24 +5,56 @@
 #include "Algorithms.h"
 #include "RANDOM_MT_H.h"
 
-char Algorithms::next_dir(Algorithms &alg) {
+char Algorithms::next_dir(Algorithms &alg, Board &Board) {
+  char dir;
   if(alg.type_ == "random"){
     int seed = Random::get(0,3);
     switch (seed) {
       case 0:
-        return 'u';
+        dir = 'u';
       case 1:
-        return 'd';
+        dir = 'd';
       case 2:
-        return 'l';
+        dir = 'l';
       case 3:
-        return 'r';
+        dir = 'r';
       default:
-        return 'd';
+        dir = 'd';
     }
+    alg.last_move_ = dir;
   } else if(alg.type_ == "corner"){
-    return 'd';
+    if (alg.last_move_ == 'l'){
+      alg.set_last_move('d');
+      dir = 'd';
+    } else{
+      alg.set_last_move('l');
+      dir = 'l';
+    }
+  } else if (alg.type_ == "eval"){
+    dir = eval(Board);
   } else {
-    return 'd';
+    dir = 'd';
   }
+
+
+  return dir;
+}
+
+char Algorithms::eval(Board &board){
+  char dirs[4]  {'u','d','l','r'};
+  BST tree;
+  tree.root = tree.insert(tree.root, 'a', board.game_score());
+  for (int i = 0; i < 4; ++i) {
+    Board new_board = board;
+    new_board.move(new_board, dirs[i]);
+    int eval_score = new_board.game_score();
+    if(new_board.game_over()) {
+      eval_score = -1;
+    } else if(new_board.invalid_move()){
+      eval_score = 0;
+    }
+    tree.root = tree.insert(tree.root, dirs[i], eval_score);
+  }
+  char ret = tree.maxNode(tree.root);
+  return ret;
 }

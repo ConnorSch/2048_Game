@@ -111,6 +111,12 @@ build CMakeFiles/2048_Program.dir/Algorithms.cpp.o: CXX_COMPILER__2048_Program_u
   OBJECT_DIR = CMakeFiles/2048_Program.dir
   OBJECT_FILE_DIR = CMakeFiles/2048_Program.dir
 
+build CMakeFiles/2048_Program.dir/BST.cpp.o: CXX_COMPILER__2048_Program_unscanned_Debug /Users/connor/CLionProjects/2048_Program/BST.cpp || cmake_object_order_depends_target_2048_Program
+  DEP_FILE = CMakeFiles/2048_Program.dir/BST.cpp.o.d
+  FLAGS = -g -std=gnu++20 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/2048_Program.dir
+  OBJECT_FILE_DIR = CMakeFiles/2048_Program.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target 2048_Program
@@ -119,7 +125,7 @@ build CMakeFiles/2048_Program.dir/Algorithms.cpp.o: CXX_COMPILER__2048_Program_u
 #############################################
 # Link the executable 2048_Program
 
-build 2048_Program: CXX_EXECUTABLE_LINKER__2048_Program_Debug CMakeFiles/2048_Program.dir/main.cpp.o CMakeFiles/2048_Program.dir/Board.cpp.o CMakeFiles/2048_Program.dir/DataConn.cpp.o CMakeFiles/2048_Program.dir/Algorithms.cpp.o | libSQLite.a || libSQLite.a
+build 2048_Program: CXX_EXECUTABLE_LINKER__2048_Program_Debug CMakeFiles/2048_Program.dir/main.cpp.o CMakeFiles/2048_Program.dir/Board.cpp.o CMakeFiles/2048_Program.dir/DataConn.cpp.o CMakeFiles/2048_Program.dir/Algorithms.cpp.o CMakeFiles/2048_Program.dir/BST.cpp.o | libSQLite.a || libSQLite.a
   FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk
   LINK_LIBRARIES = libSQLite.a  -lsqlite3
   OBJECT_DIR = CMakeFiles/2048_Program.dir

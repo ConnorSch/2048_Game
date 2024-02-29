@@ -22,6 +22,7 @@ void create_table(sqlite3* DB, const char* db_name)
 {
   std::string sql = "create table if not exists GAME_BOARD("
                     "GAME_ID        INT     NOT NULL, "
+                    "SCORE          INT     NULL, "
                     "TURN_NUM       INT     NOT NULL, "
                     "MOVE           TEXT    NULL, "
                     "POS_0          INT     NOT NULL,"
@@ -78,17 +79,19 @@ void store_state(Board &board, sqlite3* DB, const char* db_name, Function callba
 
   std::string str_dir;
   str_dir += dir;
-  std::string insert_str = "(" + std::to_string(id) + "," + std::to_string(board.num_moves()) + ",'" + str_dir + "',";
+  std::string insert_str = "(" + std::to_string(id) + "," + std::to_string(board.game_score()) + "," + std::to_string(board.num_moves()) + ",'" + str_dir + "',";
   insert_str += vector_str + ")";
 
-  std::string query = "INSERT INTO GAME_BOARD (GAME_ID,TURN_NUM,MOVE,POS_0,POS_1,POS_2,POS_3,POS_4,POS_5,POS_6,POS_7,POS_8,POS_9,POS_10,POS_11,POS_12,POS_13,POS_14,POS_15) VALUES " + insert_str;
+  std::string query = "INSERT INTO GAME_BOARD (GAME_ID,SCORE,TURN_NUM,MOVE,POS_0,POS_1,POS_2,POS_3,POS_4,POS_5,POS_6,POS_7,POS_8,POS_9,POS_10,POS_11,POS_12,POS_13,POS_14,POS_15) VALUES " + insert_str;
   exit = sqlite3_exec(DB, query.c_str(), callback, 0, &messageError);
   if (exit != SQLITE_OK) {
     std::cerr << "Error Insert" << std::endl;
     sqlite3_free(messageError);
   }
+  /*
   else
     std::cout << "Records created Successfully!" << std::endl;
+    */
   sqlite3_close(DB);
 }
 
@@ -96,9 +99,9 @@ void store_state(Board &board, sqlite3* DB, const char* db_name, Function callba
 void automatic_play(int game_id, std::pair<const char*, sqlite3*> db_info){
   int keep_playing = 1;
   Board Game_Board(4,4);
-  Algorithms Alg("random");
+  Algorithms Alg("eval");
   while(keep_playing != 0){
-    char dir = Alg.next_dir(Alg);
+    char dir = Alg.next_dir(Alg, Game_Board);
     keep_playing = Game_Board.move(Game_Board, dir);
     if(keep_playing != -1){
       store_state(Game_Board, db_info.second, db_info.first, callback, game_id, dir);
@@ -146,7 +149,7 @@ int main() {
   }
   sqlite3_finalize(stmt);
   gameID++;
-
+  std::cout << "Game ID: " << gameID << std::endl;
   bool auto_play = true;
   if(!auto_play){
     Board Game_Board(4,4);

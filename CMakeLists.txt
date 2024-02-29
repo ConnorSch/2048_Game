@@ -13,6 +13,8 @@ target_link_libraries(SQLite sqlite3)
 
 add_executable(2048_Program main.cpp Board.h RANDOM_MT_H.h Board.cpp DataConn.cpp DataConn.h
         Algorithms.cpp
-        Algorithms.h)
+        Algorithms.h
+        BST.cpp
+        BST.h)
 
 target_link_libraries(2048_Program SQLite)
