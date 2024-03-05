@@ -16,10 +16,11 @@ std::ostream& operator<< (std::ostream &out, const Board &board)
 }
 
 
-bool Board::move(Board &board, char dir){
+int Board::move(Board &board, char dir){
   int num_cols = board.num_cols();
   int num_rows = board.num_rows();
   board.num_moves_++;
+  board.invalid_move_ = false;
   std::vector<int> row;
   std::pair<std::vector<int>,bool> move_response;
   bool invalid_moves[4] = {false};
@@ -30,7 +31,7 @@ bool Board::move(Board &board, char dir){
         for (int i = 0; i < num_rows; ++i) {
           row.push_back(board(i,j));
         }
-        move_response = movement(row, true);
+        move_response = movement(board, row, true);
         std::vector<int> response_row = move_response.first;
         invalid_moves[j] = move_response.second;
         for (int k = 0; k < response_row.size(); ++k) {
@@ -45,7 +46,7 @@ bool Board::move(Board &board, char dir){
         for (int j = 0; j < num_cols; ++j) {
           row.push_back(board(i,j));
         }
-        move_response = movement(row, true);
+        move_response = movement(board, row, true);
         std::vector<int> response_row = move_response.first;
         invalid_moves[i] = move_response.second;
 
@@ -61,7 +62,7 @@ bool Board::move(Board &board, char dir){
         for (int j = num_cols - 1; j >= 0; --j) {
           row.push_back(board(i,j));
         }
-        move_response = movement(row, false);
+        move_response = movement(board, row, false);
         std::vector<int> response_row = move_response.first;
         invalid_moves[i] = move_response.second;
         for (int k = 0; k < response_row.size(); ++k) {
@@ -76,7 +77,7 @@ bool Board::move(Board &board, char dir){
         for (int i = num_rows - 1; i >= 0; --i) {
           row.push_back(board(i,j));
         }
-        move_response = movement(row, false);
+        move_response = movement(board, row, false);
         std::vector<int> response_row = move_response.first;
         invalid_moves[j] = move_response.second;
         for (int k = 0; k < response_row.size(); ++k) {
@@ -86,28 +87,31 @@ bool Board::move(Board &board, char dir){
         row.clear();
       }
       break;
-    default:
-      std::cout << "Invalid move, please enter a valid move direction" <<std::endl;
+      //std::cout << "Invalid move, please enter a valid move direction" <<std::endl;
   }
   //if all of invalid_moves is true then can't make that move
 
   bool end_game = false;
   int sum = std::accumulate(invalid_moves, invalid_moves + 4, 0);
   if (sum == 4){
-    std::cout<< "try a different direction, combinations found" << std::endl;
+    //std::cout<< "try a different direction, no combinations found" << std::endl;
+    board.num_moves_--;
+    board.invalid_move_ = true;
+    return -1;
   } else {
+
     end_game = board.next_added_digit();
   }
   if (end_game){
-    return false;
+    return 0;
   } else {
-    return true;
+    return 1;
   }
 
 
 }
 
-std::pair<std::vector<int>,bool> Board::movement(std::vector<int> row, bool reverse_row){
+std::pair<std::vector<int>,bool> Board::movement(Board &board, std::vector<int> row, bool reverse_row){
   int n = row.size();
   bool invalid_move = false;
   std::vector<int> return_vec;
@@ -118,7 +122,9 @@ std::pair<std::vector<int>,bool> Board::movement(std::vector<int> row, bool reve
   for (int i = n-1; i >= 0; --i) {
     if (row[i] != 0){
       if (!return_vec.empty() && return_vec.back() == row[i]){
-        return_vec.back() = row[i] * 2;
+        int new_val = row[i] * 2;
+        board.game_score_ += new_val;
+        return_vec.back() = new_val;
       } else {
         return_vec.push_back(row[i]);
       }
