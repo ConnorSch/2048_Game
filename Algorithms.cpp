@@ -43,17 +43,20 @@ char Algorithms::next_dir(Algorithms &alg, Board &Board) {
 char Algorithms::eval(Board &board){
   char dirs[4]  {'u','d','l','r'};
   BST tree;
+  int max_depth = 15;
   tree.root = tree.insert(tree.root, 'a', board.game_score());
-  for (int i = 0; i < 4; ++i) {
-    Board new_board = board;
-    new_board.move(new_board, dirs[i]);
-    int eval_score = new_board.game_score();
-    if(new_board.game_over()) {
-      eval_score = -1;
-    } else if(new_board.invalid_move()){
-      eval_score = 0;
+  for(int j = 0; j < max_depth; ++j) {
+    for (int i = 0; i < 4; ++i) {
+      Board new_board = board;
+      new_board.move(new_board, dirs[i]);
+      int eval_score = new_board.game_score();
+      if (new_board.game_over()) {
+        eval_score = -1;
+      } else if (new_board.invalid_move()) {
+        eval_score = 0;
+      }
+      tree.root = tree.insert(tree.root, dirs[i], eval_score);
     }
-    tree.root = tree.insert(tree.root, dirs[i], eval_score);
   }
   char ret = tree.maxNode(tree.root);
   return ret;
