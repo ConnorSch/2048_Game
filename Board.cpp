@@ -99,7 +99,7 @@ int Board::move(Board &board, char dir){
     board.invalid_move_ = true;
     return -1;
   } else {
-
+    board.last_move_ = dir;
     end_game = board.next_added_digit();
   }
   if (end_game){

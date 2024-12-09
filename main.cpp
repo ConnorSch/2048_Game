@@ -106,6 +106,9 @@ void automatic_play(int game_id, std::pair<const char*, sqlite3*> db_info){
     if(keep_playing != -1){
       store_state(Game_Board, db_info.second, db_info.first, callback, game_id, dir);
     }
+    if(Game_Board.num_moves() > 150){
+      keep_playing = 0;
+    }
   }
   std::cout << "Game ID: " << game_id << " Number of moves: " << Game_Board.num_moves() << " Score: "
   << Game_Board.game_score() << std::endl;
@@ -152,6 +155,7 @@ int main() {
   sqlite3_finalize(stmt);
   gameID++;
   bool auto_play = true;
+  std::cout << "Game started with Game ID: " << gameID << "\n";
   if(!auto_play){
     Board Game_Board(4,4);
     std::cout << Game_Board;

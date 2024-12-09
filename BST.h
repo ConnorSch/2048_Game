@@ -6,36 +6,19 @@
 #define INC_2048_PROGRAM_BST_H
 
 #include <iostream>
+#include <utility>
 #include "Board.h"
 
 class Node
 {
 public:
-    Node(){};
-    Node(Board &board){
-      Board node_board_ = board;
-    };
+    Board _node_board;
+    Node* _parent;
+    std::vector<Node*> children;
 
-    Node *left, *right;
-private:
-    Board node_board_;
+    explicit Node(Board game, Node* parent = nullptr) : _node_board(std::move(game)), _parent(parent){}
+
+    std::vector<std::pair<int,char>> findMaxPath();
 };
-
-class BST
-{
-public :
-    Node *root;
-    BST() {
-      root = NULL;
-    }
-    Node* insert(Node*, char, int);
-    int search(char);
-    void preOrder(Node*);
-    void inOrder(Node*);
-    void postOrder(Node*);
-    char maxNode(Node*);
-};
-
-
 
 #endif //INC_2048_PROGRAM_BST_H

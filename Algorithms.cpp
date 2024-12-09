@@ -4,6 +4,7 @@
 
 #include "Algorithms.h"
 #include "RANDOM_MT_H.h"
+#include <queue>
 
 char Algorithms::next_dir(Algorithms &alg, Board &Board) {
   char dir;
@@ -42,22 +43,33 @@ char Algorithms::next_dir(Algorithms &alg, Board &Board) {
 
 char Algorithms::eval(Board &board){
   char dirs[4]  {'u','d','l','r'};
-  BST tree;
-  int max_depth = 15;
-  tree.root = tree.insert(tree.root, 'a', board.game_score());
-  for(int j = 0; j < max_depth; ++j) {
+  Board new_board(board);
+  Node* root = new Node(new_board);
+  std::queue<std::pair<Node*, int>> q;
+  q.emplace(root, 0);
+  int targetDepth = 2;
+
+  while(!q.empty()){
+    Node* currentNode = q.front().first;
+    int currentDepth = q.front().second;
+    q.pop();
+
     for (int i = 0; i < 4; ++i) {
-      Board new_board = board;
-      new_board.move(new_board, dirs[i]);
-      int eval_score = new_board.game_score();
-      if (new_board.game_over()) {
-        eval_score = -1;
-      } else if (new_board.invalid_move()) {
-        eval_score = 0;
+      auto child_root = currentNode;
+      Board move_board(child_root->_node_board);
+      move_board.move(move_board, dirs[i]);
+      if (!move_board.game_over() or !move_board.invalid_move()){
+        currentNode->children.push_back(new Node(move_board, child_root));
       }
-      tree.root = tree.insert(tree.root, dirs[i], eval_score);
+    }
+    if (currentDepth == targetDepth) continue;
+    for (Node* child : currentNode->children){
+        q.emplace(child, currentDepth + 1);
     }
   }
-  char ret = tree.maxNode(tree.root);
-  return ret;
+
+  auto maxScorePath = root->findMaxPath();
+
+
+  return maxScorePath[0].second;
 }

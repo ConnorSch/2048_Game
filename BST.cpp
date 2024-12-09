@@ -4,68 +4,28 @@
 
 #include "BST.h"
 
-Node* BST :: insert(Node* root, char direction, int score){
-  Node *newNode = new Node(direction, score);
-  newNode->left = NULL;
-  newNode->right = NULL;
-  if(root == NULL){
-    root = newNode;
-  }
-  else if (score >= root->score){
-    root->right = insert(root->right, direction, score);
-  } else {
-    root->left = insert(root->left, direction, score);
-  }
-  return root;
-}
 
-int BST :: search(char searchKey) {
-  Node *temp = root;
-  while(temp != NULL){
-    if(temp->dir == searchKey){
-      return searchKey;
-    } else if(temp->dir > searchKey){
-      temp = temp->left;
-    } else {
-      temp = temp ->right;
+std::vector<std::pair<int, char>> Node::findMaxPath() {
+  std::vector<std::pair<int, char>> maxPath;
+  std::vector<std::pair<int,char>> currentPath;
+
+  int maxValue = std::numeric_limits<int>::min();
+
+  std::function<void(Node*)> traverse = [&](Node* node){
+    if (!node) return;
+
+    int game_score = node->_node_board.game_score();
+    char game_dir = node->_node_board.last_move();
+    currentPath.emplace_back(game_score, game_dir);
+    if (game_score > maxValue){
+      maxValue = game_score;
+      maxPath = currentPath;
     }
-  }
-  return -1;
-}
-
-
-void BST :: preOrder(Node* root){
-  if(root != NULL){
-    std::cout << root->dir << " ";
-    preOrder(root->left);
-    preOrder(root->right);
-  }
-}
-
-void BST :: inOrder(Node* root) {
-  if(root != NULL){
-    inOrder(root->left);
-    std::cout << root-> dir << " ";
-    inOrder(root->right);
-  }
-}
-
-
-void BST :: postOrder(Node* root) {
-  //Write your code here
-  if(root != NULL){
-    postOrder(root->left);
-    postOrder(root->right);
-    std::cout << root-> dir << " ";
-  }
-}
-
-char BST::maxNode(Node* root) {
-  char t_dir;
-  if (root->right == NULL)
-    t_dir = root->dir;
-  else {
-    t_dir = maxNode(root->right);
-  }
-  return t_dir;
+    for (Node* child : node->children){
+      traverse(child);
+    }
+    currentPath.pop_back();
+  };
+  traverse(this);
+  return maxPath;
 }

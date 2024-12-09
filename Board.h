@@ -19,6 +19,7 @@ public:
        num_moves_ = 0;
        game_score_ = 0;
        invalid_move_ = false;
+       last_move_ = 'd';
     }
 
     int&       operator()(int i, int j) { return storage_[i * num_cols_ + j]; }
@@ -34,6 +35,7 @@ public:
     [[nodiscard]] int game_score() const {return game_score_;}
     [[nodiscard]] bool game_over() const {return game_over_;}
     [[nodiscard]] bool invalid_move() const {return invalid_move_;}
+    [[nodiscard]] char last_move() const {return last_move_;}
 
     friend std::ostream& operator<< (std::ostream& out, const Board& board);
 
@@ -75,6 +77,7 @@ private:
     int num_moves_;
     int game_score_;
     int invalid_move_;
+    char last_move_;
 };
 
 #endif //UNTITLED3_BOARD_H
